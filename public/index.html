@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>LED Controller</title>
+	<!-- <script src="http://ajax.aspnetcdn.com/ajax/jquery.ui/1.8.17/jquery-ui.min.js" type="text/javascript"></script> -->
+    <link href="./fawsm/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+	<link href="./stylesheets/step.css" rel="stylesheet" type="text/css" /> 
+	<!-- <link href="./stylesheets/round.css" rel="stylesheet" type="text/css" /> 	-->
+	</head>
+
+	<body>
+
+	<div class="wrapper-1">
+		<ul id="nav">
+		    <li><b class="fa fa-home"></b></li>
+		    <li><b class="fa fa-picture-o"></b></li>
+		    <li onclick="TakeSnap()"><b class="fa fa-video-camera"></b></li>
+		    <li><b class="fa fa-headphones"></b></li>
+		    <li><b class="fa fa-user"></b></li>
+		</ul>
+	</div>
+
+	<div class="wrapper-2">
+		<ul id="nav">
+		    <li class="top left" onclick="httpGet('http://lu6itharm.no-ip.org:8080/?serverfunction=ledSwitch&value=1&led=5')"><b class="fa fa-arrow-left"></b></li>
+		    <li class="top right" onclick="httpGet('http://lu6itharm.no-ip.org:8080/?serverfunction=ledSwitch&value=1&led=4')"><b class="fa fa-arrow-up"></b></li>
+		    <li class="bottom left" onclick="httpGet('http://lu6itharm.no-ip.org:8080/?serverfunction=ledSwitch&value=0&led=4')"><b class="fa fa-arrow-down"></b></li>
+		    <li class="bottom right" onclick="httpGet('http://lu6itharm.no-ip.org:8080/?serverfunction=ledSwitch&value=0&led=5')"><b class="fa fa-arrow-right"></b></li>
+		</ul>
+	</div>
+	
+	<div class="wrapper-3">
+		<ul id="nav">
+		<li id="camera01"><img name="camera01" src='./images/image.png' height="400" width="560"/></li>
+		</ul>
+	</div>
+	
+	<div id="info01"> 
+		<p id="pinfo02" align="middle">Wyzwalanie snapshota ... </p>
+	</div>
+	
+	<div class="wrapper-4">
+	    <h2>Light switch</h2>
+		<ul id="nav">
+		    <li class="on" onclick="toggleBut()"><b class="fa fa-dot-circle-o"></b></li>
+		    <li class="active off" onclick="toggleBut()"><b class="fa fa-circle-o"></b></li> 
+		</ul>
+	</div>  
+
+	<div class="wrapper-5">
+	    <!-- <h2>Light switch</h2> -->
+	    <h2>Camera switch</h2>
+		<ul id="nav">
+		    <li class="on" onclick="toggleBut1()"><b class="fa fa-dot-circle-o"></b></li>
+		    <li class="active off" onclick="toggleBut1()"><b class="fa fa-circle-o"></b></li> 
+		</ul>
+	</div>  
+	
+	<script type="text/javascript" src="./javascripts/date.js"></script>
+	<!--jQuery References-->
+	<script src="./javascripts/jquery-1.11.0.min.js" type="text/javascript"></script>
+
+	<script>
+	function TakePict(script, iddok)
+	{ 
+		var req = null; 
+
+		document.getElementById(iddok).innerHTML = "Czekaj ...";
+		if(window.XMLHttpRequest)
+			req = new XMLHttpRequest(); 
+		else if (window.ActiveXObject)
+			req  = new ActiveXObject(Microsoft.XMLHTTP); 
+
+		req.onreadystatechange = function()
+		{ 
+			document.getElementById(iddok).innerHTML = "Czekaj ...";
+			if(req.readyState == 4)
+			{
+				if(req.status == 200)
+				{
+					if(req.responseText == '')
+					{
+					 document.getElementById(iddok).innerHTML = "Brak odpowiedzi !!!!! ";
+					}
+					else
+					{
+					 document.getElementById(iddok).innerHTML = "... Zdjęcie zrobione ! ..." + req.responseText;
+					}
+				}	
+				else	
+				{
+					document.getElementById(iddok).style = "color: #b2045b;";				
+					document.getElementById(iddok).innerHTML = "Error:  " + req.status + " " + req.statusText;
+				}	
+			} 
+		}; 
+		req.open("GET", "/cgi-bin/" + script, true); 
+		req.setRequestHeader("Content-Type", "application/x-www-form-urlencoded"); 
+	};
+
+
+	function update()
+		{
+			$('#pinfo02').text('Taking snapshot ...'); 
+			//location.reload();
+			$.ajax({
+				type: 'GET',
+				url: '/cgi-bin/snap.sh',
+				timeout: 20000,
+				success: function(data) {
+					//$("#camera01").html(data);
+					$('#pinfo02').text('.... done ...'); 
+					window.setTimeout(update, 10000);
+				},
+				error: function (XMLHttpRequest, textStatus, errorThrown) {
+					$('#pinfo02').text('Timeout contacting server..');
+					window.setTimeout(update, 60000);
+				}
+			});
+		};
+		
+	function TakeSnap()
+		{
+			TakePict('pocv.py', 'pinfo02');
+			var now = new Date();
+			var tim0 = new Date().toString("dddd d MMMM yyyy, HH:mm:ss");
+			if (document.images) {
+				$('#camera01').fadeOut('slow');
+				document.images.camera01.src = './images/image.png?' + now.getTime();
+				$('#camera01').fadeIn("slow");
+				$('#pinfo02').text("Snapshot z godz.: " + tim0);
+			}
+				//$('#camera01').fadeOut('slow').html("<img src='img/image.png'/>").fadeIn("slow");
+				//$('#camera01').fadeOut('slow').load("/ #pict01").fadeIn("slow");
+				//location.reload();
+		};
+		
+    function httpGet( theUrl )
+        {
+	        var xmlHttp = null;
+ 
+	        xmlHttp = new XMLHttpRequest();
+	        xmlHttp.open( 'GET', theUrl, false );
+	        xmlHttp.send( null );
+			    
+	        return xmlHttp.responseText;
+        };		
+    
+    function toggleBut() {
+        $( ".wrapper-4 li.on" ).toggleClass( "active" );
+        $( ".wrapper-4 li.off" ).toggleClass( "active" );
+    };
+    
+    function toggleBut1() {
+        $( ".wrapper-5 li.on" ).toggleClass( "active" );
+        $( ".wrapper-5 li.off" ).toggleClass( "active" );
+    };
+	
+	</script> 
+	
+	</body>
+</html>
+

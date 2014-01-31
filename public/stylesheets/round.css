@@ -1,0 +1,169 @@
+body #container {
+  position: relative;
+  margin: 0 auto;
+  border-radius: 50%;
+  top: 10%;
+  right: 20%;
+  margin-top: -76px;
+  height: 112px;
+  width: 112px;
+}
+body #container #base {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+}
+body #container #base section {
+  height: 52px;
+  width: 52px;
+  background: #191919;
+  position: absolute;
+  box-shadow: inset 0 2px 1px rgba(0, 0, 0, 0.3);
+  -webkit-transition: all .1s;
+  transition: all .1s;
+}
+body #container #base section.top {
+  top: 0;
+}
+body #container #base section.top.left {
+  border-radius: 100% 0px 0px 0px;
+  left: 0;
+}
+body #container #base section.top.right {
+  border-radius: 0px 100% 0px 0px;
+  right: 0;
+}
+body #container #base section.bottom {
+  bottom: 0;
+}
+body #container #base section.bottom.left {
+  border-radius: 0px 0px 0px 100%;
+  left: 0;
+}
+body #container #base section.bottom.right {
+  border-radius: 0px 0px 100% 0px;
+  right: 0;
+}
+body #container #base.top .top {
+  box-shadow: inset 0 2px 1px rgba(0, 0, 0, 0.5), inset 0 0px 25px rgba(0, 0, 0, 0.5);
+}
+body #container #base.top .bottom {
+  background: #191919;
+  box-shadow: inset 0 2px 1px rgba(0, 0, 0, 0.3);
+}
+body #container #base.bottom .bottom {
+  box-shadow: inset 0 2px 1px rgba(0, 0, 0, 0.5), inset 0 0px 25px rgba(0, 0, 0, 0.5);
+}
+body #container #base.bottom .top {
+  background: #191919;
+  box-shadow: inset 0 2px 1px rgba(0, 0, 0, 0.3);
+}
+body #container #base.left .left {
+  box-shadow: inset 0 2px 1px rgba(0, 0, 0, 0.5), inset 0 0px 25px rgba(0, 0, 0, 0.5);
+}
+body #container #base.left .right {
+  background: #191919;
+  box-shadow: inset 0 2px 1px rgba(0, 0, 0, 0.3);
+}
+body #container #base.right .right {
+  box-shadow: inset 0 2px 1px rgba(0, 0, 0, 0.5), inset 0 0px 25px rgba(0, 0, 0, 0.5);
+}
+body #container #base.right .left {
+  background: #191919;
+  box-shadow: inset 0 2px 1px rgba(0, 0, 0, 0.3);
+}
+body #container #base.left.top .bottom.left {
+  background: #191919;
+  box-shadow: inset 0 2px 1px rgba(0, 0, 0, 0.3);
+}
+body #container #base.right.top .bottom.right {
+  background: #191919;
+  box-shadow: inset 0 2px 1px rgba(0, 0, 0, 0.3);
+}
+body #container #base.bottom.right .top.right {
+  background: #191919;
+  box-shadow: inset 0 2px 1px rgba(0, 0, 0, 0.3);
+}
+body #container #base.bottom.left .top.left {
+  background: #191919;
+  box-shadow: inset 0 2px 1px rgba(0, 0, 0, 0.3);
+}
+body #container #joystick {
+  width: 91px;
+  height: 91px;
+  position: absolute;
+  border-radius: 50%;
+  top: 10px;
+  left: 10px;
+  background: #0f0f11;
+  background: linear-gradient(45deg, #0f0f11 0%, #47474b 100%);
+  box-shadow: inset 0 0 1px rgba(255, 255, 255, 0.4), 0 2px 3px rgba(0, 0, 0, 0.7);
+}
+body #container #joystick .inner {
+  position: absolute;
+  height: 81px;
+  width: 81px;
+  border-radius: 50%;
+  top: 5px;
+  left: 5px;
+  background: #191919;
+  background: linear-gradient(45deg, #303031 0%, #161515 100%);
+  box-shadow: inset 0 0 1px rgba(255, 255, 255, 0.2);
+}
+body #container #joystick .inner #roller {
+  position: absolute;
+  height: 120px;
+  width: 120px;
+  border-radius: 50%;
+  top: 26px;
+  left: 26px;
+  background: #131313;
+  background: radial-gradient(ellipse at center, #313131 0%, #131313 100%);
+  box-shadow: inset 0 0 20px black, 0 1px 1px rgba(255, 255, 255, 0.1);
+}
+body #container #joystick .inner #stick {
+  height: 80px;
+  width: 80px;
+  position: absolute;
+  border-radius: 50%;
+  left: 20px;
+  top: 20px;
+  background: #0f0f11;
+  background: linear-gradient(180deg, #1e1e1e 0%, #677072 100%);
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.8), 0 8px 8px rgba(0, 0, 0, 0.6);
+  -webkit-transition: all .1s;
+  transition: all .1s;
+}
+body #container #joystick .inner #stick.left {
+  left: 0;
+}
+body #container #joystick .inner #stick.right {
+  left: 40px;
+}
+body #container #joystick .inner #stick.top {
+  top: 0;
+}
+body #container #joystick .inner #stick.bottom {
+  top: 40px;
+}
+body #container #joystick .inner #stick .inner {
+  height: 68px;
+  width: 68px;
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, #3a3939 0%, #131313 100%);
+  box-shadow: inset 0 0 2px black, 0 1px 1px rgba(255, 255, 255, 0.1);
+}
+
+@media screen and (max-height: 500px) {
+  body h1, body h2 {
+    font-size: 30px;
+  }
+}
+@media screen and (max-height: 390px) {
+  body h1, body h2 {
+    display: none;
+  }
+}
