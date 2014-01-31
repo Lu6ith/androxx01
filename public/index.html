@@ -123,14 +123,19 @@
 		
 	function TakeSnap()
 		{
-			TakePict('pocv.py', 'pinfo02');
+			//TakePict('pocv.py', 'pinfo02');
+			var callback = httpGet('http://lu6itharm.no-ip.org:8080/?serverfunction=takePict');
 			var now = new Date();
 			var tim0 = new Date().toString("dddd d MMMM yyyy, HH:mm:ss");
 			if (document.images) {
-				$('#camera01').fadeOut('slow');
-				document.images.camera01.src = './images/image.png?' + now.getTime();
-				$('#camera01').fadeIn("slow");
-				$('#pinfo02').text("Snapshot z godz.: " + tim0);
+			    if (callback === 0) {
+				    $('#camera01').fadeOut('slow');
+				    document.images.camera01.src = './images/image.png?' + now.getTime();
+				    $('#camera01').fadeIn("slow");
+				    $('#pinfo02').text("Snapshot z godz.: " + tim0);
+			    } else {
+			        $('#pinfo02').text(tim0 + " --- ERROR !!!");
+			    }
 			}
 				//$('#camera01').fadeOut('slow').html("<img src='img/image.png'/>").fadeIn("slow");
 				//$('#camera01').fadeOut('slow').load("/ #pict01").fadeIn("slow");
