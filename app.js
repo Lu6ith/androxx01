@@ -19,6 +19,11 @@ var util  = require('util'),
     spawn = require('child_process').spawn;
     //ls    = spawn('ls', ['-lh', '/usr']);
     
+var five = require( 'johnny-five' ),
+    board;
+
+board = new five.Board();
+
 //var scribe = require('./scribe');    
 
 // all environments
@@ -58,7 +63,28 @@ console.high("[Tagname]Simple message");
 console.normal("[Tagname]Simple message");
 console.low("[Tagname]Simple message"); */
 
-var APIFunctions = {
+// The board's pins will not be accessible until
+// the board has reported that it is ready
+board.on("ready", function() {
+	var val = 0;
+
+	// Set pin 4 and 5 to OUTPUT mode
+	this.pinMode( 4, 1 );
+	this.pinMode( 5, 1 );
+ 
+	// Mode Table
+	// INPUT:   0
+	// OUTPUT:  1
+	// ANALOG:  2
+	// PWM:     3
+	// SERVO:   4
+	this.digitalWrite( 4, 1 );
+	this.digitalWrite( 5, 1 );
+
+	/* Api functions */
+	var self = this;	
+
+	var APIFunctions = {
  
 		GET : {
 			ledSwitch : function ( data, callback ){
@@ -66,10 +92,9 @@ var APIFunctions = {
 				data.url.value = parseInt( data.url.value, 0 );
 				data.url.led = parseInt( data.url.led, 0);
 				if( data.url.value === 1 || data.url.value === 0){
-				
 					console.info( "[ledSwitch]", data.url.led, data.url.value );
-				}
- 
+					self.digitalWrite( data.url.led, data.url.value );
+				};	 
 				callback( data.url.value );
 			},
 			takePict : function (data, callback) {
@@ -95,20 +120,18 @@ var APIFunctions = {
 			}
 		},
 		POST : {}
-};
+	};
+
+	console.log( narf );
  
-console.log( narf );
+	var hs = new narf.HttpServer( { port : 8080 } ).start();
  
-var hs = new narf.HttpServer( { port : 8080 } ).start();
- 
-hs.on( 'port', function( port ){
- 
-	hs.addAPI( { functions : APIFunctions } );
-} );
-	
+	hs.on( 'port', function( port ){
+		hs.addAPI( { functions : APIFunctions } );
+	} );	
+});
  
 narf.setDebug( true );
-
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server is listening on port ' + app.get('port'));

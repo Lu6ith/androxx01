@@ -44,8 +44,8 @@
 	<div class="wrapper-4">
 	    <h2>Light switch</h2>
 		<ul id="nav">
-		    <li class="on" onclick="toggleBut()"><b class="fa fa-dot-circle-o"></b></li>
-		    <li class="active off" onclick="toggleBut()"><b class="fa fa-circle-o"></b></li> 
+		    <li class="on" onclick="toggleBut('0')"><b class="fa fa-dot-circle-o"></b></li>
+		    <li class="active off" onclick="toggleBut('1')"><b class="fa fa-circle-o"></b></li> 
 		</ul>
 	</div>  
 
@@ -53,8 +53,8 @@
 	    <!-- <h2>Light switch</h2> -->
 	    <h2>Camera switch</h2>
 		<ul id="nav">
-		    <li class="on" onclick="toggleBut1()"><b class="fa fa-dot-circle-o"></b></li>
-		    <li class="active off" onclick="toggleBut1()"><b class="fa fa-circle-o"></b></li> 
+		    <li class="on" onclick="toggleBut1('0')"><b class="fa fa-dot-circle-o"></b></li>
+		    <li class="active off" onclick="toggleBut1('1')"><b class="fa fa-circle-o"></b></li> 
 		</ul>
 	</div>  
 	
@@ -153,14 +153,16 @@
 	        return xmlHttp.responseText;
         };		
     
-    function toggleBut() {
+    function toggleBut(onoff) {
         $( ".wrapper-4 li.on" ).toggleClass( "active" );
         $( ".wrapper-4 li.off" ).toggleClass( "active" );
+		httpGet('http://192.168.72.30:8080/?serverfunction=ledSwitch&value=' + onoff + '&led=5');        
     };
     
-    function toggleBut1() {
+    function toggleBut1(onoff) {
         $( ".wrapper-5 li.on" ).toggleClass( "active" );
         $( ".wrapper-5 li.off" ).toggleClass( "active" );
+		httpGet('http://192.168.72.30:8080/?serverfunction=ledSwitch&value=' + onoff + '&led=4');        
     };
 	
 	</script> 
