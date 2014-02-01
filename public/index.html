@@ -24,10 +24,10 @@
 
 	<div class="wrapper-2">
 		<ul id="nav">
-		    <li class="top left" onclick="httpGet('http://lu6itharm.no-ip.org:8080/?serverfunction=ledSwitch&value=1&led=5')"><b class="fa fa-arrow-left"></b></li>
-		    <li class="top right" onclick="httpGet('http://lu6itharm.no-ip.org:8080/?serverfunction=ledSwitch&value=1&led=4')"><b class="fa fa-arrow-up"></b></li>
-		    <li class="bottom left" onclick="httpGet('http://lu6itharm.no-ip.org:8080/?serverfunction=ledSwitch&value=0&led=4')"><b class="fa fa-arrow-down"></b></li>
-		    <li class="bottom right" onclick="httpGet('http://lu6itharm.no-ip.org:8080/?serverfunction=ledSwitch&value=0&led=5')"><b class="fa fa-arrow-right"></b></li>
+		    <li class="top left" onclick="httpGet('http://192.168.72.30:8080/?serverfunction=ledSwitch&value=1&led=5')"><b class="fa fa-arrow-left"></b></li>
+		    <li class="top right" onclick="httpGet('http://192.168.72.30:8080/?serverfunction=ledSwitch&value=1&led=4')"><b class="fa fa-arrow-up"></b></li>
+		    <li class="bottom left" onclick="httpGet('http://192.168.72.30:8080/?serverfunction=ledSwitch&value=0&led=4')"><b class="fa fa-arrow-down"></b></li>
+		    <li class="bottom right" onclick="httpGet('http://192.168.72.30:8080/?serverfunction=ledSwitch&value=0&led=5')"><b class="fa fa-arrow-right"></b></li>
 		</ul>
 	</div>
 	
@@ -124,17 +124,17 @@
 	function TakeSnap()
 		{
 			//TakePict('pocv.py', 'pinfo02');
-			var callback = httpGet('http://lu6itharm.no-ip.org:8080/?serverfunction=takePict');
+			var callback = httpGet("http://192.168.72.30:8080/?serverfunction=takePict&file=/home/debian/Git/androxx01/public/cgi-bin/pocv.py");
 			var now = new Date();
 			var tim0 = new Date().toString("dddd d MMMM yyyy, HH:mm:ss");
 			if (document.images) {
-			    if (callback === 0) {
+			    if (callback === '0') {
 				    $('#camera01').fadeOut('slow');
 				    document.images.camera01.src = './images/image.png?' + now.getTime();
 				    $('#camera01').fadeIn("slow");
 				    $('#pinfo02').text("Snapshot z godz.: " + tim0);
 			    } else {
-			        $('#pinfo02').text(tim0 + " --- ERROR !!!");
+			        $('#pinfo02').text(tim0 + " --- ERROR !!!" + callback);
 			    }
 			}
 				//$('#camera01').fadeOut('slow').html("<img src='img/image.png'/>").fadeIn("slow");

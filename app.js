@@ -25,6 +25,7 @@ var util  = require('util'),
 app.set('port', process.env.PORT || 8079);
 app.set('views', path.join(__dirname, 'views'));
 //app.set('view engine', 'jade');
+app.set('env', 'development');
 app.use(express.favicon());
 app.use(express.logger('dev'));
 app.use(express.json());
@@ -37,6 +38,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // development only
 if ('development' == app.get('env')) {
   app.use(express.errorHandler());
+  console.info("[Develop]");
 }
 
 //app.get('/', routes.index);
@@ -71,21 +73,22 @@ var APIFunctions = {
 				callback( data.url.value );
 			},
 			takePict : function (data, callback) {
-			    //var pocv  = spawn('/home/linaro/pubwww/androxx01/public/cgi-bin/pocv.py', []);
-		        var pocv = spawn('/home/linaro/pubwww/androxx01/public/cgi-bin/pocv.py', []);
+			    //var pocv  = spawn('/home/debian/Git/androxx01/public/cgi-bin/pocv.py', []);
+			    console.info('[takePict] stdout: ' + data.url.file);
+		        var pocv = spawn(data.url.file, []);
 	            var outcode;
 			    
 			    pocv.stdout.on('data', function (data) {
-                  console.info('[takePict]stdout: ' + data);
+                  console.info('[takePict] stdout: ' + data);
                 });
 
                 pocv.stderr.on('data', function (data) {
-                  console.error('[takePict]stderr: ' + data);
+                  console.error('[takePict] stderr: ' + data);
                 });
 
                 pocv.on('exit', function (code) {
                   outcode = code;
-                  console.log('[takePict]child process exited with code ' + code);
+                  console.log('[takePict] child process exited with code ' + code);
                   callback(outcode);
                 });
                 

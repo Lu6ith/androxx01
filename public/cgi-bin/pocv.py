@@ -11,10 +11,10 @@ except IOError:
     exit(1)
 
 # cv.NamedWindow('a_window', cv.CV_WINDOW_AUTOSIZE)
-pin_path = '/sys/class/misc/sun4i-gpio/pin' 	#path to GPIO pins
-f = open(pin_path + '/ph20', 'w')		#pin with green LED
-f.write('1')					#turn LED on
-f.flush()
+# pin_path = '/sys/class/misc/sun4i-gpio/pin' 	#path to GPIO pins
+# f = open(pin_path + '/ph20', 'w')		#pin with green LED
+# f.write('1')					#turn LED on
+# f.flush()
 
 capt1 = cv.CaptureFromCAM(0)
 
@@ -28,12 +28,13 @@ x = 5
 y = 470 
 cv.PutText(image, "Praca ->  " + time.asctime(time.localtime()), (x,y), font, 0xFFEB8F) #Draw the text
 # cv.ShowImage('a_window', image) #Show the image
-cv.WaitKey(10)
-cv.SaveImage('/home/debian/public_html/img/image.png', image) #Saves the image
+cv.WaitKey(-1)
+cv.SaveImage('/home/debian/Git/androxx01/public/images/image.png', image) #Saves the image
 
 # turn LED off !
-f.write('0')
-f.flush()
-f.close()
+# f.write('0')
+# f.flush()
+# f.close()
 
 print ("Done!")
+exit(0)
