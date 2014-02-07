@@ -83,6 +83,34 @@ board.on("ready", function() {
 
 	/* Api functions */
 	var self = this;	
+	var Bmp085 = require('./bmp085'),
+	    testStandardMode = function () {
+	       	var barometer = new Bmp085({'debug': true});
+	        barometer.read(function (data) {
+	            console.log("Standard mode", data);
+	            testHighresMode();
+	        });
+	    },
+	    testHighresMode = function () {
+	        var barometer = new Bmp085({'mode':2});
+	        barometer.read(function (data) {
+	            console.log("Highres mode", data);
+	            testUltraHighresMode();
+	        });
+
+	    },
+	    testUltraHighresMode = function () {
+	        var barometer = new Bmp085({'mode':3});
+	        barometer.read(function (data) {
+	            console.log("Ultra highres mode", data);
+	        });
+	    },
+	    startTest = function () {
+	        testStandardMode();
+	    };
+    
+	/* configuration of I2C device */
+	/* this.firmata.sendI2CConfig(); */
 
 	var APIFunctions = {
  
@@ -117,6 +145,24 @@ board.on("ready", function() {
                   callback(outcode);
                 });
                 
+			},
+			readSensor : function (data, callback){
+				console.log('[readSensor] pocztek testow !')
+				startTest();
+				self.firmata.sendI2CWriteRequest(0x68,[0x22,0x00,0x08,0x2A]);
+				self.firmata.sendI2CReadRequest(0x68,4,function(data){
+					var ppms = 0;
+					ppms |= data[1] & 0xFF;
+					ppms = ppms << 8;
+					ppms |= data[2] & 0xFF;
+					var checksum = data[0] + data[1] + data[2];
+					if(checksum === data[3]){
+						console.log('Current PPMs: '+ppms);
+					} else {
+						console.log('Checksum failure');
+					}
+				});
+				callback('OK');
 			}
 		},
 		POST : {}
