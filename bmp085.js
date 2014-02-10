@@ -1,7 +1,7 @@
 //var Wire = require('i2c'),
 var EventEmitter = require('events').EventEmitter,
     _ = require('underscore'),
-    debug,
+    debug, redy,
     defaultOptions = {
         'debug' : false,
         'address' : 0x77,
@@ -13,13 +13,16 @@ var BMP085 = function (opts) {
     var self = this;
     self.options = _.extend({}, defaultOptions, opts);
     self.events = new EventEmitter();
+    self.events.setMaxListeners(20);
     //self.wire = new Wire(this.options.address, {device: this.options.device, debug: this.options.debug});
 
     self.events.on('calibrated', function () {
+        log("Calibrated !");
         self.readData(self.userCallback);
     });
 
     debug = self.options.debug;
+    redy = true;
 };
 
 BMP085.prototype.modes = {
@@ -127,24 +130,42 @@ BMP085.prototype.readWord = function (register, length, callback) {
         callback = length;
         length = 2;
     }
-    log("Read Word", self.registers.control.location, self.commands.readTemp);
-    self.firmata.sendI2CReadRequest(register.location, length, function(err, bytes) {
-        if (err) {
-            log("Read temp ERROR !!!");
-            throw(err);
-        }
+    //log("Read Word", register.location, self.options.address, length);
+    if (redy) {
+        redy = false;
+ 
+        selfboard.io.sendI2CWriteRequest(self.options.address, [register.location]);
+        selfboard.io.sendI2CReadRequest(self.options.address, length, function(bytes) {
 
-        var hi = bytes.readUInt8(0),
-            lo = bytes.readUInt8(1),
+        var buf = new Buffer([bytes[0], bytes[1]]);
+        // buf[0] = bytes[0].toString();
+        // buf[1] = bytes[1].toString();
+
+        var hi = buf[0],
+            lo = buf[1],
             value;
+
+        var ppms = 0;
+        ppms |= bytes[0] & 0xFF;
+        ppms = ppms << 8;
+        ppms |= bytes[1] & 0xFF;
 
         if (register.type !== 'uint16') {
             hi = self.unsigned(hi);
         }
 
+
         value = (hi << 8) + lo;
+        redy = true;
+        log("Read I2C - ", register.location, bytes[0], bytes[1], ppms, value);
         callback(register, value);
-    });
+        });
+    } else {
+            setTimeout(function () {
+              self.readWord(register, length, callback);
+            }, 5);
+    };
+        
 };
 
 BMP085.prototype.calibrate = function () {
@@ -171,14 +192,14 @@ BMP085.prototype.waitForCalibrationData = function () {
         if (typeof self.calibrationData[register.name] === 'undefined') {
             ready = false;
         }
-    }
-    if (ready) {
+    };
+    if (ready && redy) {
         self.events.emit('calibrated');
     } else {
         setTimeout(function () {
             self.waitForCalibrationData();
         }, 5);
-    }
+    };
 };
 
 BMP085.prototype.readData = function (callback) {
@@ -198,16 +219,12 @@ BMP085.prototype.readTemperature = function (callback) {
     var self = this;
 
     log("Read temp", self.registers.control.location, self.commands.readTemp);
-    self.firmata.sendI2CWriteRequest(self.registers.control.location, new Buffer([self.commands.readTemp]), function(err) {
-        if (err) {
-            throw(err);
-        }
-        setTimeout(function() {
-            self.readWord(self.registers.tempData, function(reg, value) {
-                callback(value);
-            });
-        }, 5);
-    });
+    selfboard.io.sendI2CWriteRequest(self.options.address, [self.registers.control.location, self.commands.readTemp] );
+    setTimeout(function (){
+        self.readWord(self.registers.tempData, function(reg, value) {
+            callback(value);
+        });
+    }, 10);
 };
 
 BMP085.prototype.convertTemperature = function (raw) {
@@ -225,24 +242,18 @@ BMP085.prototype.convertTemperature = function (raw) {
 BMP085.prototype.readPressure = function (callback) {
     var self = this;
 
-    self.firmata.sendI2CWriteRequest(self.registers.control.location, new Buffer([self.commands.readPressure + (self.options.mode << 6)]), function(err) {
-        if (err) {
-            throw(err);
-        }
+    selfboard.io.sendI2CWriteRequest(self.options.address, [self.registers.control.location, self.commands.readPressure + (self.options.mode << 6)] );
         var timeToWait = self.getTimeToWait();
         setTimeout(function() {
-            self.wire.readBytes(self.registers.pressureData.location, 3, function(err, bytes) {
-                if (err) {
-                    throw(err);
-                }
-                var msb = bytes.readUInt8(0),
-                    lsb = bytes.readUInt8(1),
-                    xlsb = bytes.readUInt8(2),
+            selfboard.io.sendI2CWriteRequest(self.options.address, [self.registers.pressureData.location]);
+            selfboard.io.sendI2CReadRequest(self.options.address, 3, function(bytes) {
+                var msb = bytes[0] & 0xFF,
+                    lsb = bytes[1] & 0xFF,
+                    xlsb = bytes[2] & 0xFF,
                     value = ((msb << 16) + (lsb << 8) + xlsb) >> (8 - self.options.mode);
                 callback(value);
             });
         }, timeToWait);
-    });
 };
 
 BMP085.prototype.convertPressure = function (raw) {
@@ -280,6 +291,10 @@ BMP085.prototype.convertPressure = function (raw) {
 BMP085.prototype.read = function (callback) {
     this.userCallback = callback;
     this.calibrate();
+};
+
+BMP085.prototype.queryFirmware = function (callback) {
+    selfboard.io.queryFirmware(callback); 
 };
 
 var log = function () {

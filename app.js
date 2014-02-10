@@ -22,8 +22,10 @@ var util  = require('util'),
 var five = require( 'johnny-five' ),
     board;
 
-board = new five.Board();
-
+var Board = require('firmata').Board;
+/*var firmata = new Board('/dev/ttyACM0',function(){
+		console.log("Firmata is up");
+	});*/	
 //var scribe = require('./scribe');    
 
 // all environments
@@ -63,10 +65,30 @@ console.high("[Tagname]Simple message");
 console.normal("[Tagname]Simple message");
 console.low("[Tagname]Simple message"); */
 
+board = new five.Board({type: 'LEONARDO', debug: true});
+
 // The board's pins will not be accessible until
 // the board has reported that it is ready
+
 board.on("ready", function() {
 	var val = 0;
+	var pin = 7;
+	var redy = true;
+
+	var i2cRead = function(obj, address, cmd, length, data) {
+        if (redy) {
+            redy = false;
+        	obj.io.sendI2CWriteRequest(address, [cmd]);
+            return obj.io.sendI2CReadRequest(address, length, function(data){
+        		  console.log('i2cRead data - ', data, cmd, length);
+        		  redy = true;
+        		});
+        } else {
+        	setTimeout(function () {
+              i2cRead(obj, address, cmd, length, data);
+        	}, 5);
+    	};
+    };      
 
 	// Set pin 4 and 5 to OUTPUT mode
 	this.pinMode( 4, 1 );
@@ -81,8 +103,14 @@ board.on("ready", function() {
 	this.digitalWrite( 4, 1 );
 	this.digitalWrite( 5, 1 );
 
+	console.log("Board ready !" + board.type + " - " + board.debug);
+
 	/* Api functions */
 	var self = this;	
+	global.selfboard = this;
+	var isReady = false;
+	var data = [];
+
 	var Bmp085 = require('./bmp085'),
 	    testStandardMode = function () {
 	       	var barometer = new Bmp085({'debug': true});
@@ -109,6 +137,17 @@ board.on("ready", function() {
 	        testStandardMode();
 	    };
     
+    var i2cConfig = function(delay) {
+        if (delay == null) {
+          delay = null;
+        }
+        this.io.sendI2CConfig(delay);
+        return isReady = true;
+      };
+
+    i2cRead(this, 0x77, 0xAA, 4, data);  
+   	i2cRead(this, 0x77, 0xB0, 3, data);
+
 	/* configuration of I2C device */
 	/* this.firmata.sendI2CConfig(); */
 
@@ -147,21 +186,10 @@ board.on("ready", function() {
                 
 			},
 			readSensor : function (data, callback){
-				console.log('[readSensor] pocztek testow !')
-				startTest();
-				self.firmata.sendI2CWriteRequest(0x68,[0x22,0x00,0x08,0x2A]);
-				self.firmata.sendI2CReadRequest(0x68,4,function(data){
-					var ppms = 0;
-					ppms |= data[1] & 0xFF;
-					ppms = ppms << 8;
-					ppms |= data[2] & 0xFF;
-					var checksum = data[0] + data[1] + data[2];
-					if(checksum === data[3]){
-						console.log('Current PPMs: '+ppms);
-					} else {
-						console.log('Checksum failure');
-					}
-				});
+				console.log('[readSensor] poczatek testow !');
+
+				startTest(); 
+
 				callback('OK');
 			}
 		},
