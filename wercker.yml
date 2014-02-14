@@ -11,3 +11,10 @@ build:
     - script:
         name: wintersmith build
         code: ./node_modules/.bin/wintersmith build -o ./build
+
+deploy:
+  steps:
+    - Lu6ith/gh-pages:
+        token: $GH_TOKEN
+        basedir: build
+        domain: Lu6ith.github.io
